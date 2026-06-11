@@ -1,0 +1,47 @@
+{
+  "name": "gardener",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "verify:android": "npm run typecheck && npx expo export --platform android --clear",
+    "build:android:preview": "npx eas-cli build --platform android --profile preview",
+    "build:android:production": "npx eas-cli build --platform android --profile production",
+    "submit:android:production": "npx eas-cli submit --platform android --profile production"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/datetimepicker": "8.4.4",
+    "@react-navigation/bottom-tabs": "^7.16.1",
+    "@react-navigation/native": "^7.2.4",
+    "@react-navigation/native-stack": "^7.15.1",
+    "@types/react": "~19.1.10",
+    "expo": "~54.0.35",
+    "expo-constants": "~18.0.13",
+    "expo-localization": "~17.0.9",
+    "expo-notifications": "~0.32.17",
+    "expo-status-bar": "~3.0.9",
+    "firebase": "^12.13.0",
+    "lucide-react-native": "^1.16.0",
+    "nativewind": "^4.2.4",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-calendars": "^1.1314.0",
+    "react-native-reanimated": "4.1.1",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-worklets": "0.5.1",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~5.9.2"
+  },
+  "private": true,
+  "devDependencies": {
+    "babel-preset-expo": "^54.0.10",
+    "react-native-svg-transformer": "^1.5.3"
+  }
+}

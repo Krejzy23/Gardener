@@ -1,0 +1,182 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function ownsIncomingDoc(userId) {
+      return request.resource.data.ownerId == userId;
+    }
+
+    function ownsExistingDoc(userId) {
+      return resource.data.ownerId == userId;
+    }
+
+    function hasField(field) {
+      return request.resource.data.keys().hasAny([field]);
+    }
+
+    function optionalString(field) {
+      return !hasField(field) ||
+        request.resource.data[field] == null ||
+        request.resource.data[field] is string;
+    }
+
+    function optionalTimestamp(field) {
+      return !hasField(field) ||
+        request.resource.data[field] == null ||
+        request.resource.data[field] is timestamp;
+    }
+
+    function optionalPositiveInt(field) {
+      return !hasField(field) ||
+        (
+          request.resource.data[field] is int &&
+          request.resource.data[field] > 0
+        );
+    }
+
+    function isPlantCategory(category) {
+      return category in ['ornamental', 'fruiting', 'herb', 'vegetable', 'succulent', 'other'];
+    }
+
+    function isPlantEnvironment(environment) {
+      return environment in ['indoor', 'outdoor'];
+    }
+
+    function isLightExposure(light) {
+      return light in ['full_sun', 'partial_shade', 'shade'];
+    }
+
+    function isPlantHealth(health) {
+      return health in ['healthy', 'watching', 'needs_care', 'recovering'];
+    }
+
+    function isCareTaskType(type) {
+      return type in ['watering', 'fertilizing'];
+    }
+
+    function plantExistsAfter(userId, plantId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/plants/$(plantId));
+    }
+
+    function careTaskExistsAfter(userId, taskId) {
+      return existsAfter(/databases/$(database)/documents/users/$(userId)/careTasks/$(taskId));
+    }
+
+    function validPlantDoc(userId) {
+      return ownsIncomingDoc(userId) &&
+        request.resource.data.keys().hasOnly([
+          'ownerId',
+          'name',
+          'plantCount',
+          'category',
+          'environment',
+          'light',
+          'health',
+          'age',
+          'waterType',
+          'fertilizerType',
+          'notes',
+          'createdAt',
+          'updatedAt',
+        ]) &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        optionalPositiveInt('plantCount') &&
+        isPlantCategory(request.resource.data.category) &&
+        isPlantEnvironment(request.resource.data.environment) &&
+        isLightExposure(request.resource.data.light) &&
+        isPlantHealth(request.resource.data.health) &&
+        optionalString('age') &&
+        optionalString('waterType') &&
+        optionalString('fertilizerType') &&
+        optionalString('notes') &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+    }
+
+    function validCareTaskDoc(userId) {
+      return ownsIncomingDoc(userId) &&
+        request.resource.data.keys().hasOnly([
+          'ownerId',
+          'plantId',
+          'type',
+          'intervalDays',
+          'nextDueAt',
+          'lastCompletedAt',
+          'reminderTime',
+          'enabled',
+          'createdAt',
+          'updatedAt',
+        ]) &&
+        request.resource.data.plantId is string &&
+        plantExistsAfter(userId, request.resource.data.plantId) &&
+        isCareTaskType(request.resource.data.type) &&
+        request.resource.data.intervalDays is int &&
+        request.resource.data.intervalDays > 0 &&
+        request.resource.data.nextDueAt is timestamp &&
+        optionalTimestamp('lastCompletedAt') &&
+        optionalString('reminderTime') &&
+        request.resource.data.enabled is bool &&
+        request.resource.data.createdAt is timestamp &&
+        request.resource.data.updatedAt is timestamp;
+    }
+
+    function validCareEventDoc(userId) {
+      return ownsIncomingDoc(userId) &&
+        request.resource.data.keys().hasOnly([
+          'ownerId',
+          'plantId',
+          'taskId',
+          'type',
+          'completedAt',
+          'scheduledFor',
+          'note',
+        ]) &&
+        request.resource.data.plantId is string &&
+        request.resource.data.taskId is string &&
+        plantExistsAfter(userId, request.resource.data.plantId) &&
+        careTaskExistsAfter(userId, request.resource.data.taskId) &&
+        isCareTaskType(request.resource.data.type) &&
+        request.resource.data.completedAt is timestamp &&
+        optionalTimestamp('scheduledFor') &&
+        optionalString('note');
+    }
+
+    match /users/{userId} {
+      allow read, create, update, delete: if isOwner(userId);
+
+      match /plants/{plantId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validPlantDoc(userId);
+        allow update: if isOwner(userId) && ownsExistingDoc(userId) && validPlantDoc(userId);
+        allow delete: if isOwner(userId) && ownsExistingDoc(userId);
+      }
+
+      match /careTasks/{taskId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validCareTaskDoc(userId);
+        allow update: if isOwner(userId) && ownsExistingDoc(userId) && validCareTaskDoc(userId);
+        allow delete: if isOwner(userId) && ownsExistingDoc(userId);
+      }
+
+      match /careEvents/{eventId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && validCareEventDoc(userId);
+        allow update: if isOwner(userId) && ownsExistingDoc(userId) && validCareEventDoc(userId);
+        allow delete: if isOwner(userId) && ownsExistingDoc(userId);
+      }
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

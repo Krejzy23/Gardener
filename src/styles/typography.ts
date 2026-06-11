@@ -1,0 +1,18 @@
+export const typography = {
+  appTitle: 'text-[44px] leading-[48px] font-extrabold tracking-normal',
+  pageTitle: 'text-[34px] leading-[40px] font-extrabold tracking-normal',
+  heroTitle: 'text-[30px] leading-[36px] font-extrabold tracking-normal',
+  sectionTitle: 'text-[20px] leading-[26px] font-bold tracking-normal',
+  cardTitle: 'text-[18px] leading-[24px] font-bold tracking-normal',
+  cardTitleLarge: 'text-[22px] leading-[28px] font-bold tracking-normal',
+  metric: 'text-[32px] leading-[36px] font-extrabold tracking-normal',
+  body: 'text-[14px] leading-5 font-medium tracking-normal',
+  bodyStrong: 'text-[14px] leading-5 font-semibold tracking-normal',
+  label: 'text-[12px] leading-4 font-bold uppercase tracking-normal',
+  fieldLabel: 'text-[14px] leading-4 font-bold tracking-normal',
+  chip: 'text-[12px] leading-4 font-bold tracking-normal',
+  button: 'text-[16px] leading-5 font-bold tracking-normal',
+  input: 'text-[16px] leading-5 font-medium tracking-normal',
+  empty: 'text-[14px] leading-5 font-semibold tracking-normal',
+  caption: 'text-[12px] leading-4 font-semibold tracking-normal',
+};
