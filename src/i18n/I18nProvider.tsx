@@ -1,18 +1,13 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getLocales } from "expo-localization";
+import { useLocales } from "expo-localization";
 import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 
 import {
-  languageNames,
-  supportedLanguages,
   translations,
   type LanguageCode,
   type TranslationKey,
@@ -20,14 +15,9 @@ import {
 } from "./translations";
 
 type I18nContextValue = {
-  deviceLanguage: LanguageCode;
-  isLoadingLanguage: boolean;
   language: LanguageCode;
-  setLanguage: (language: LanguageCode) => Promise<void>;
   t: (key: TranslationKey | string, params?: TranslationParams) => string;
 };
-
-const LANGUAGE_STORAGE_KEY = "gardener:language";
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
@@ -35,19 +25,8 @@ type I18nProviderProps = {
   children: ReactNode;
 };
 
-function isLanguageCode(value: unknown): value is LanguageCode {
-  return (
-    typeof value === "string" &&
-    supportedLanguages.includes(value as LanguageCode)
-  );
-}
-
-function getDeviceLanguage(): LanguageCode {
-  const locale =
-    getLocales()[0]?.languageTag ??
-    Intl.DateTimeFormat().resolvedOptions().locale;
-
-  return locale.toLowerCase().startsWith("cs") ? "cs" : "en";
+function getSupportedLanguage(locale?: string | null): LanguageCode {
+  return locale?.toLowerCase().startsWith("cs") ? "cs" : "en";
 }
 
 function interpolate(value: string, params?: TranslationParams): string {
@@ -63,38 +42,10 @@ function interpolate(value: string, params?: TranslationParams): string {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [deviceLanguage] = useState<LanguageCode>(() => getDeviceLanguage());
-  const [isLoadingLanguage, setIsLoadingLanguage] = useState(true);
-  const [language, setLanguageState] = useState<LanguageCode>(deviceLanguage);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadLanguage() {
-      try {
-        const storedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
-
-        if (isMounted && isLanguageCode(storedLanguage)) {
-          setLanguageState(storedLanguage);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingLanguage(false);
-        }
-      }
-    }
-
-    void loadLanguage();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const setLanguage = useCallback(async (nextLanguage: LanguageCode) => {
-    await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
-    setLanguageState(nextLanguage);
-  }, []);
+  const locales = useLocales();
+  const language = getSupportedLanguage(
+    locales[0]?.languageCode ?? locales[0]?.languageTag
+  );
 
   const t = useCallback(
     (key: TranslationKey | string, params?: TranslationParams) => {
@@ -111,13 +62,10 @@ export function I18nProvider({ children }: I18nProviderProps) {
 
   const value = useMemo<I18nContextValue>(
     () => ({
-      deviceLanguage,
-      isLoadingLanguage,
       language,
-      setLanguage,
       t,
     }),
-    [deviceLanguage, isLoadingLanguage, language, setLanguage, t]
+    [language, t]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
@@ -133,5 +81,4 @@ export function useI18n() {
   return context;
 }
 
-export { languageNames };
 export type { LanguageCode, TranslationKey };

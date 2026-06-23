@@ -2,13 +2,6 @@ export type LanguageCode = "cs" | "en";
 
 export type TranslationParams = Record<string, string | number>;
 
-export const supportedLanguages: LanguageCode[] = ["cs", "en"];
-
-export const languageNames: Record<LanguageCode, string> = {
-  cs: "Čeština",
-  en: "English",
-};
-
 export const languageLocales: Record<LanguageCode, string> = {
   cs: "cs-CZ",
   en: "en-US",
@@ -247,9 +240,6 @@ export const translations = {
     "settings.notification.previewOnly": "Dostupné v preview buildu",
     "settings.notification.enabledNoTasks": "Zapnuto, zatím bez úkolů",
     "settings.notification.waitingPermission": "Čeká na povolení v systému",
-    "settings.language": "Jazyk",
-    "settings.languageDescription": "Výchozí jazyk se načítá podle zařízení. Tady ho můžeš přepnout pro kontrolu.",
-    "settings.languageDevice": "Jazyk zařízení",
     "settings.info.auth": "Autentizace",
     "settings.info.authValue": "Firebase Auth s oddělenými uživatelskými daty",
     "settings.info.firestore": "Firestore",
@@ -468,9 +458,6 @@ export const translations = {
     "settings.notification.previewOnly": "Available in a preview build",
     "settings.notification.enabledNoTasks": "Enabled, no tasks yet",
     "settings.notification.waitingPermission": "Waiting for system permission",
-    "settings.language": "Language",
-    "settings.languageDescription": "The default language follows the device. You can switch it here for testing.",
-    "settings.languageDevice": "Device language",
     "settings.info.auth": "Authentication",
     "settings.info.authValue": "Firebase Auth with separated user data",
     "settings.info.firestore": "Firestore",

@@ -5,7 +5,6 @@ import {
   BellOff,
   CheckCircle2,
   Database,
-  Globe2,
   LockKeyhole,
   LogOut,
   Mail,
@@ -21,11 +20,6 @@ import { Screen } from "@/components/Screen";
 import { useAuth } from "@/hooks/useAuth";
 import { useCareNotifications } from "@/hooks/useCareNotifications";
 import { useI18n } from "@/i18n/I18nProvider";
-import {
-  languageNames,
-  supportedLanguages,
-  type LanguageCode,
-} from "@/i18n/translations";
 import { typography } from "@/styles/typography";
 import type {
   CareNotificationPermissionStatus,
@@ -77,7 +71,7 @@ function getNotificationStatusTone(
 }
 
 export function SettingsPage() {
-  const { deviceLanguage, language, setLanguage, t } = useI18n();
+  const { language, t } = useI18n();
   const { signOut, user } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const {
@@ -299,53 +293,6 @@ export function SettingsPage() {
             </Text>
           </View>
         ) : null}
-      </View>
-
-      <View className="gap-4 rounded-lg border border-stone-100 bg-white p-4 shadow-sm shadow-stone-200">
-        <View className="flex-row items-start gap-3">
-          <View className="h-11 w-11 items-center justify-center rounded-lg bg-emerald-50">
-            <Globe2 color="#047857" size={22} strokeWidth={2.2} />
-          </View>
-          <View className="min-w-0 flex-1">
-            <Text className={`${typography.cardTitle} text-stone-950`}>
-              {t("settings.language")}
-            </Text>
-            <Text className={`mt-1 ${typography.body} text-stone-600`}>
-              {t("settings.languageDescription")}
-            </Text>
-            <Text
-              className={`mt-2 self-start rounded-md bg-stone-100 px-2 py-1 ${typography.chip} text-stone-600`}
-            >
-              {t("settings.languageDevice")}: {languageNames[deviceLanguage]}
-            </Text>
-          </View>
-        </View>
-
-        <View className="flex-row gap-2">
-          {supportedLanguages.map((option: LanguageCode) => {
-            const isSelected = language === option;
-
-            return (
-              <Pressable
-                className={`flex-1 items-center rounded-lg border px-3 py-3 active:opacity-90 ${
-                  isSelected
-                    ? "border-emerald-700 bg-emerald-700"
-                    : "border-stone-100 bg-stone-50"
-                }`}
-                key={option}
-                onPress={() => void setLanguage(option)}
-              >
-                <Text
-                  className={`${typography.bodyStrong} ${
-                    isSelected ? "text-white" : "text-stone-700"
-                  }`}
-                >
-                  {languageNames[option]}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
       </View>
 
       <View className="gap-3">

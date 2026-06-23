@@ -4,7 +4,7 @@ import './global.css';
 import { AppLoading } from '@/components/AppLoading';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { CareNotificationsProvider } from '@/hooks/useCareNotifications';
-import { I18nProvider, useI18n } from '@/i18n/I18nProvider';
+import { I18nProvider } from '@/i18n/I18nProvider';
 import { PlantCareProvider } from '@/hooks/usePlantCareData';
 import { BottomTabs } from '@/navigation/BottomTabs';
 import { AuthPage } from '@/pages/AuthPage';
@@ -25,9 +25,8 @@ export default function App() {
 
 function AppContent() {
   const { isLoading, user } = useAuth();
-  const { isLoadingLanguage } = useI18n();
 
-  if (isLoading || isLoadingLanguage) {
+  if (isLoading) {
     return <AppLoading />;
   }
 
